@@ -2,12 +2,11 @@ module resident_system::survival {
     use sui::event;
     use sui::object::ID;
     use sui::random;
-    use sui::tx_context::TxContext;
 
     use resident_system::hunter::{Self, Hunter};
     use resident_system::inventory::{Self, Ammo, GreenHerb};
     use resident_system::session_key::{Self, SessionKey};
-    use resident_system::virus_state::{Self, InfectionControlCap, VirusState};
+    use resident_system::virus_state::{Self, VirusState};
     use resident_system::zombie::{Self, SmallZombie};
 
     const E_NO_AMMO: u64 = 0;
@@ -25,28 +24,38 @@ module resident_system::survival {
         infection_added: u64,
     }
 
-    public fun attack_small_with_session(
-        key: &SessionKey,
-        cap: &InfectionControlCap,
+    public entry fun attack_small_entry(
         hunter: &mut Hunter,
         zombie: &mut SmallZombie,
         ammo: &mut Ammo,
         virus_state: &mut VirusState,
-        rng: &mut random::RandomGenerator,
-        ctx: &mut TxContext,
+        random_obj: &random::Random,
+        ctx: &mut sui::tx_context::TxContext,
+    ) {
+        let mut rng = random::new_generator(random_obj, ctx);
+        attack_small(hunter, zombie, ammo, virus_state, &mut rng, ctx);
+    }
+
+    public entry fun attack_small_with_session(
+        key: &SessionKey,
+        hunter: &mut Hunter,
+        zombie: &mut SmallZombie,
+        ammo: &mut Ammo,
+        virus_state: &mut VirusState,
+        random_obj: &random::Random,
+        ctx: &mut sui::tx_context::TxContext,
     ) {
         session_key::assert_valid(key, sui::tx_context::epoch(ctx));
-        attack_small(cap, hunter, zombie, ammo, virus_state, rng, ctx);
+        attack_small_entry(hunter, zombie, ammo, virus_state, random_obj, ctx);
     }
 
     public fun attack_small(
-        cap: &InfectionControlCap,
         hunter: &mut Hunter,
         zombie: &mut SmallZombie,
         ammo: &mut Ammo,
         virus_state: &mut VirusState,
         rng: &mut random::RandomGenerator,
-        ctx: &mut TxContext,
+        ctx: &mut sui::tx_context::TxContext,
     ) {
         assert!(inventory::ammo_count(ammo) > 0, E_NO_AMMO);
         inventory::consume_one_ammo(ammo);
@@ -60,12 +69,13 @@ module resident_system::survival {
 
         if (killed) {
             hunter::add_kill(hunter, 1);
-            virus_state::decrease_infection(cap, virus_state, 1, sui::tx_context::epoch(ctx));
-            virus_state::add_total_kills(cap, virus_state, 1, sui::tx_context::epoch(ctx));
+            virus_state::decrease_infection(virus_state, 1, sui::tx_context::epoch(ctx));
+            virus_state::add_total_kills(virus_state, 1, sui::tx_context::epoch(ctx));
 
+            let frag_id = (zombie::entity_id_small(zombie) % 1000) as u64;
             let fragment = inventory::mint_fragment(
-                zombie::entity_id_small(zombie),
-                zombie::entity_id_small(zombie),
+                frag_id,
+                1, // Default area
                 ctx,
             );
             inventory::add_to_inventory_fragment(hunter, fragment);
@@ -83,7 +93,7 @@ module resident_system::survival {
         key: &SessionKey,
         hunter: &mut Hunter,
         herb: GreenHerb,
-        ctx: &TxContext,
+        ctx: &sui::tx_context::TxContext,
     ) {
         session_key::assert_valid(key, sui::tx_context::epoch(ctx));
         use_herb(hunter, herb);
@@ -98,8 +108,17 @@ module resident_system::survival {
             next_hp = max_hp;
         };
         hunter::set_hp(hunter, next_hp);
-        hunter::sub_herb_count(hunter, 1);
+        // Note: remove_from_inventory_green_herb already calls sub_herb_count
         inventory::destroy_herb(herb);
+    }
+
+    public entry fun use_herb_entry(
+        hunter: &mut Hunter,
+        herb_id: sui::object::ID,
+        ctx: &mut sui::tx_context::TxContext,
+    ) {
+        let herb = inventory::remove_from_inventory_green_herb(hunter, herb_id);
+        use_herb(hunter, herb);
     }
 
     public fun take_damage_with_session(
@@ -107,7 +126,7 @@ module resident_system::survival {
         hunter: &mut Hunter,
         damage: u64,
         virus_state: &VirusState,
-        ctx: &mut TxContext,
+        ctx: &mut sui::tx_context::TxContext,
     ) {
         session_key::assert_valid(key, sui::tx_context::epoch(ctx));
         take_damage(hunter, damage, virus_state);
@@ -130,20 +149,20 @@ module resident_system::survival {
 
     #[test]
     fun test_small_zombie_kill_sequence() {
-        let mut ctx = sui::tx_context::dummy();
+        let mut ctx = sui::tx_context::new_from_hint(@0xAB, 0, 0, 0, 0);
         let (mut virus, cap) = virus_state::new_for_testing(&mut ctx);
-        virus_state::increase_infection(&cap, &mut virus, 20, 1);
+        virus_state::increase_infection(&mut virus, 20, 1);
 
         let mut hunter_obj = hunter::create_hunter_for_testing(2, &mut ctx);
         let mut ammo = inventory::new_ammo_for_testing(0, 3, &mut ctx);
 
         let mut spawn_rng = random::new_generator_from_seed_for_testing(x"0101010101010101");
-        let mut z = zombie::spawn_small(777, &virus, &mut spawn_rng);
+        let mut z = zombie::spawn_small(777, &virus, &mut spawn_rng, &mut ctx);
 
         let mut fight_rng = random::new_generator_from_seed_for_testing(x"ffffffffffffffff");
-        attack_small(&cap, &mut hunter_obj, &mut z, &mut ammo, &mut virus, &mut fight_rng, &mut ctx);
+        attack_small(&mut hunter_obj, &mut z, &mut ammo, &mut virus, &mut fight_rng, &mut ctx);
 
-        let (_, _, _, _, _, kills, _) = hunter::get_stats(&hunter_obj);
+        let (_, _, hp, _, _, kills, _) = hunter::get_stats(&hunter_obj);
         assert!(inventory::ammo_count(&ammo) == 2, E_NO_AMMO + 10);
         assert!(zombie::is_dead_small(&z), E_NO_AMMO + 11);
         assert!(kills == 1, E_NO_AMMO + 12);
@@ -154,8 +173,8 @@ module resident_system::survival {
             let fragment = inventory::pop_one_fragment(&mut hunter_obj);
             inventory::destroy_fragment(fragment);
         };
+        zombie::destroy_small(z);
         hunter::destroy_for_testing(hunter_obj);
         virus_state::destroy_for_testing(virus, cap);
     }
 }
-

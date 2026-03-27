@@ -9,9 +9,10 @@ import {
 } from '@onelabs/dapp-kit';
 import { OneIDProvider } from "../context/OneIDContext";
 import { WalletProvider } from "../context/WalletContext";
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Transaction } from '@onelabs/sui/transactions';
 import { useCurrentAccount, useDisconnectWallet } from '@onelabs/dapp-kit';
+import { type OneWalletClient } from "../lib/onewallet";
 import '@onelabs/dapp-kit/dist/index.css';
 
 const queryClient = new QueryClient();
@@ -26,22 +27,18 @@ function AppProviders({ children }: { children: React.ReactNode }) {
   const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
 
-  useEffect(() => {
-    // Bridge dapp-kit wallet into window.onewallet so WalletContext can use it
-    window.onewallet = {
-      connect: async () => {
-        if (!currentAccount) throw new Error("Please connect via the Connect button");
-        return { address: currentAccount.address };
-      },
-      disconnect: async () => {
-        await disconnectWallet();
-      },
-      getOwnedObjects: async ({ owner, filter }) => {
+  // Bridge dapp-kit wallet into window.onewallet immediately
+  const walletClient = useMemo<OneWalletClient | null>(() => {
+    if (typeof window === "undefined" || !currentAccount) return null;
+
+    return {
+      connect: async () => ({ address: currentAccount.address }),
+      disconnect: async () => { await disconnectWallet(); },
+      getOwnedObjects: async ({ owner, filter }: { owner: string; filter?: { StructType?: string } }) => {
         if (!owner) return { data: [] };
         let hasNextPage = true;
         let nextCursor: string | null = null;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const objects: any[] = [];
+        const objects: any[] = []; // Explicit any to match Sui response types
         try {
           while (hasNextPage) {
             const res = await suiClient.getOwnedObjects({
@@ -54,38 +51,42 @@ function AppProviders({ children }: { children: React.ReactNode }) {
             hasNextPage = res.hasNextPage;
             nextCursor = res.nextCursor ?? null;
           }
-        } catch {
-          return { data: [] };
-        }
+        } catch { return { data: [] }; }
         return {
           data: objects
             .filter(o => o.data != null)
             .map(o => ({
               objectId: o.data.objectId,
               type: o.data.type ?? '',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               content: (o.data.content as any)?.fields ?? o.data.content,
             })),
         };
       },
-      moveCall: async (args) => {
+      moveCall: async (args: { packageId: string; module: string; func: string; args?: any[]; typeArguments?: string[] }) => {
         const tx = new Transaction();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const callArgs = (args.args || []).map((a: any) => {
+        const callArgs = (args.args || []).map((a: unknown) => {
           if (typeof a === "string" && a.startsWith("0x")) return tx.object(a);
           if (typeof a === "string") return tx.pure.string(a);
-          if (typeof a === "number") return tx.pure.u8(a); // Defaulting to u8 for class, or let user pass TxArg
+          if (typeof a === "number") {
+             if (args.func === "create_hunter") return tx.pure.u8(a);
+             return tx.pure.u64(a); 
+          }
           if (typeof a === "boolean") return tx.pure.bool(a);
           return a;
-        }) as any;
+        });
+
         tx.moveCall({
           target: `${args.packageId}::${args.module}::${args.func}`,
-          arguments: callArgs,
+          arguments: callArgs as any,
           typeArguments: args.typeArguments || [],
         });
-        tx.setGasBudget(100000000); // 0.1 OCT budget
-        const response = await signAndExecuteTransaction({ transaction: tx });
-        return { digest: response.digest };
+        tx.setGasBudget(10000000); 
+        
+        return await signAndExecuteTransaction({ 
+             transaction: tx,
+             // @ts-expect-error - dapp-kit types might be outdated
+             options: { showEffects: true, showObjectChanges: true }
+        });
       },
       subscribe: async (eventType: string, cb: (e: unknown) => void) => {
         const unsub = await suiClient.subscribeEvent({
@@ -97,6 +98,12 @@ function AppProviders({ children }: { children: React.ReactNode }) {
       getEpochDurationMs: async () => 1000,
     };
   }, [suiClient, currentAccount, signAndExecuteTransaction, disconnectWallet]);
+
+  useEffect(() => {
+    if (walletClient) {
+      window.onewallet = walletClient;
+    }
+  }, [walletClient]);
 
   return (
     <OneIDProvider>

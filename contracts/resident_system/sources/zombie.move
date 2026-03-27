@@ -15,7 +15,8 @@ module resident_system::zombie {
     const BIG_HP_MIN: u64 = 2000;
     const BIG_HP_MAX: u64 = 10000;
 
-    public struct SmallZombie has copy, drop, store {
+    public struct SmallZombie has key, store {
+        id: UID,
         entity_id: u64,
         hp: u64,
         speed_tier: u8,
@@ -36,6 +37,7 @@ module resident_system::zombie {
         seed: u64,
         state: &VirusState,
         rng: &mut random::RandomGenerator,
+        ctx: &mut TxContext,
     ): SmallZombie {
         let infection = virus_state::get_infection_rate(state);
         let base_hp = random::generate_u64_in_range(rng, SMALL_HP_MIN, SMALL_HP_MAX);
@@ -46,6 +48,7 @@ module resident_system::zombie {
         vector::push_back(&mut loot_pool, ((seed + infection) % 8) as u8);
 
         SmallZombie {
+            id: object::new(ctx),
             entity_id: seed,
             hp: base_hp,
             speed_tier,
@@ -148,27 +151,33 @@ module resident_system::zombie {
         zombie.hp == 0
     }
 
+    public(package) fun destroy_small(zombie: SmallZombie) {
+        let SmallZombie { id, entity_id: _, hp: _, speed_tier: _, loot_pool: _, xp_reward: _ } = zombie;
+        object::delete(id);
+    }
+
     public fun is_dead_big(zombie: &BigZombie): bool {
         zombie.hp == 0
     }
 
     #[test]
     fun test_spawn_small_hp_range() {
-        let mut ctx = sui::tx_context::dummy();
+        let mut ctx = tx_context::dummy();
         let (state, cap) = virus_state::new_for_testing(&mut ctx);
 
         let mut rng = random::new_generator_from_seed_for_testing(x"0102030405060708");
-        let z = spawn_small(123, &state, &mut rng);
+        let z = spawn_small(123, &state, &mut rng, &mut ctx);
 
         assert!(z.hp >= SMALL_HP_MIN, E_SMALL_HP_OUT_OF_RANGE);
         assert!(z.hp <= SMALL_HP_MAX, E_SMALL_HP_OUT_OF_RANGE);
 
+        destroy_small(z);
         virus_state::destroy_for_testing(state, cap);
     }
 
     #[test]
     fun test_spawn_big_required_officers_range() {
-        let mut ctx = sui::tx_context::dummy();
+        let mut ctx = tx_context::dummy();
         let (state, cap) = virus_state::new_for_testing(&mut ctx);
 
         let mut rng = random::new_generator_from_seed_for_testing(x"0a0b0c0d0e0f1011");
@@ -181,4 +190,3 @@ module resident_system::zombie {
         virus_state::destroy_for_testing(state, cap);
     }
 }
-

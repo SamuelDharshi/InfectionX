@@ -40,7 +40,6 @@ module resident_system::virus_state {
     }
 
     public(package) fun increase_infection(
-        _cap: &InfectionControlCap,
         state: &mut VirusState,
         rate_delta: u64,
         current_epoch: u64,
@@ -55,7 +54,6 @@ module resident_system::virus_state {
     }
 
     public(package) fun decrease_infection(
-        _cap: &InfectionControlCap,
         state: &mut VirusState,
         rate_delta: u64,
         current_epoch: u64,
@@ -78,7 +76,6 @@ module resident_system::virus_state {
     }
 
     public(package) fun add_total_kills(
-        _cap: &InfectionControlCap,
         state: &mut VirusState,
         amount: u64,
         current_epoch: u64,
@@ -120,10 +117,10 @@ module resident_system::virus_state {
         let mut ctx = tx_context::dummy();
         let (mut state, cap) = new_for_testing(&mut ctx);
 
-        increase_infection(&cap, &mut state, 200, 1);
+        increase_infection(&mut state, 200, 1);
         assert!(state.infection_rate == 100, E_INVALID_CLASS);
 
-        decrease_infection(&cap, &mut state, 150, 2);
+        decrease_infection(&mut state, 150, 2);
         assert!(state.infection_rate == 0, E_INVALID_CLASS);
 
         destroy_for_testing(state, cap);

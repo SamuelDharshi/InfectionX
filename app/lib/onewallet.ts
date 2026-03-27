@@ -53,24 +53,33 @@ export async function normalizeOwnedObjects(input: Promise<OwnedObjectsResponse>
   return Array.isArray(result) ? result : result.data;
 }
 
-export function extractCreatedObjectId(result: unknown): string | null {
+export function extractCreatedObjectId(result: any): string | null {
   if (!result || typeof result !== "object") {
     return null;
   }
 
-  const root = result as Record<string, unknown>;
-
-  if (typeof root.objectId === "string") {
-    return root.objectId;
+  // 1. Check objectChanges (Sui standard, most reliable)
+  if (result.objectChanges && Array.isArray(result.objectChanges)) {
+    // Find the first created object
+    const created = result.objectChanges.find((c: any) => c.type === "created" || c.type === "published");
+    if (created && created.objectId) {
+      return created.objectId;
+    }
   }
 
-  const effects = root.effects as Record<string, unknown> | undefined;
-  const created = effects?.created as Array<Record<string, unknown>> | undefined;
-  const first = created?.[0];
-  const reference = first?.reference as Record<string, unknown> | undefined;
+  // 2. Check effects.created (Alternative structure)
+  const effects = result.effects;
+  if (effects && effects.created && Array.isArray(effects.created) && effects.created.length > 0) {
+    const first = effects.created[0];
+    const reference = first.reference;
+    if (reference && typeof reference.objectId === "string") {
+      return reference.objectId;
+    }
+  }
 
-  if (typeof reference?.objectId === "string") {
-    return reference.objectId;
+  // 3. Fallback to root objectId
+  if (typeof result.objectId === "string") {
+    return result.objectId;
   }
 
   return null;

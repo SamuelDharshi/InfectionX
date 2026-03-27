@@ -54,9 +54,11 @@ type WalletContextValue = {
   zombies: ZombieState[];
   raidState: RaidState;
   infectionRate: number;
+  isHunterCheckPending: boolean;
   error: string | null;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
+  createHunter: (classId: number) => Promise<void>;
   createOrRefreshSession: (durationEpochs?: number) => Promise<void>;
   refreshInventory: () => Promise<void>;
   refreshZombies: () => Promise<void>;
@@ -123,6 +125,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     allReady: false,
   });
   const [infectionRate, setInfectionRate] = useState(0);
+  const [isHunterCheckPending, setIsHunterCheckPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const withErrorBoundary = useCallback(async (fn: () => Promise<void>) => {
@@ -216,32 +219,42 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const existing = await getOwnedByType(owner, TYPES.hunter);
-    if (existing.length > 0) {
-      setHunterId(existing[0].objectId);
-      return;
-    }
-
-    isCreatingHunter.current = true;
+    setIsHunterCheckPending(true);
     try {
-      // Specifically send [0] as u8 and not object if needed (handled by bridge now)
-      const result = await client.moveCall({
-        packageId: PACKAGE_ID,
-        module: MODULES.hunter,
-        func: "create_hunter",
-        args: [0], // Class 0
-      });
-
-      const createdId = extractCreatedObjectId(result);
-      if (createdId) {
-        setHunterId(createdId);
+      const existing = await getOwnedByType(owner, TYPES.hunter);
+      if (existing.length > 0) {
+        setHunterId(existing[0].objectId);
       }
-    } catch {
-      // Still need hunter? Try refresh next tick
     } finally {
-      isCreatingHunter.current = false;
+      setIsHunterCheckPending(false);
     }
   }, []);
+
+  const createHunter = useCallback(async (classId: number) => {
+    await withErrorBoundary(async () => {
+      const client = getOneWalletClient();
+      if (!client || !PACKAGE_ID) {
+        throw new Error("Wallet client or package id is not configured");
+      }
+
+      isCreatingHunter.current = true;
+      try {
+        const result = await client.moveCall({
+          packageId: PACKAGE_ID,
+          module: MODULES.hunter,
+          func: "create_hunter",
+          args: [classId],
+        });
+
+        const createdId = extractCreatedObjectId(result);
+        if (createdId) {
+          setHunterId(createdId);
+        }
+      } finally {
+        isCreatingHunter.current = false;
+      }
+    });
+  }, [withErrorBoundary]);
 
   const connect = useCallback(async () => {
     // Connection handled by dapp-kit ConnectButton
@@ -326,18 +339,26 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
 
       const client = getOneWalletClient();
-      if (!client || !PACKAGE_ID) {
-        throw new Error("Wallet client or package id is not configured");
+      const VIRUS_STATE_ID = process.env.NEXT_PUBLIC_VIRUS_STATE_ID;
+      if (!client || !PACKAGE_ID || !VIRUS_STATE_ID) {
+        throw new Error("Wallet client, package id, or virus state id not configured");
       }
 
       await client.moveCall({
         packageId: PACKAGE_ID,
         module: MODULES.survival,
         func: "attack_small_with_session",
-        args: [sessionKeyRef.current, hunterId, zombieId, selectedAmmoId],
+        args: [
+           sessionKeyRef.current, 
+           hunterId, 
+           zombieId, 
+           selectedAmmoId,
+           VIRUS_STATE_ID,  // Global Virus State
+           "0x8"            // Global Random Generator
+        ],
       });
 
-      await Promise.all([refreshInventory(), refreshZombies()]);
+      await Promise.all([refreshInventory(), refreshZombies(), refreshRaidState()]);
     });
   }, [hunterId, refreshInventory, refreshZombies, selectedAmmoId, withErrorBoundary]);
 
@@ -444,9 +465,11 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       zombies,
       raidState,
       infectionRate,
+      isHunterCheckPending,
       error,
       connect,
       disconnect,
+      createHunter,
       createOrRefreshSession,
       refreshInventory,
       refreshZombies,
@@ -463,6 +486,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       attackSmall,
       connect,
       connected,
+      createHunter,
       createOrRefreshSession,
       disconnect,
       error,
@@ -480,6 +504,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       sessionKeyId,
       consumeHerb,
       zombies,
+      isHunterCheckPending,
     ],
   );
 

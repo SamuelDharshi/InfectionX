@@ -1,0 +1,31 @@
+# root
+node_modules/
+.pnpm-store/
+.npm/
+.tools/
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env
+.env
+.env.local
+app/.env.local
+
+# build artifacts
+app/.next/
+app/out/
+app/.turbo/
+resident-system-(onecity)/dist/
+contracts/resident_system/build/
+contracts/resident_system/build_out.txt
+contracts/resident_system/build_output.txt
+
+# editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/*.log

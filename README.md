@@ -12,12 +12,15 @@ InfectionX is a next-generation high-stakes survival RPG built on **OneChain (Su
 
 InfectionX bridges the gap between traditional survival horror and blockchain persistence. Every bullet fired, every herb consumed, and every zombie neutralized is an on-chain transaction that evolves the state of the "Virus Grid."
 
-## 🚀 **Core Features**
+## 🚀 **OneChain-Native Integration**
 
-### 💉 **The Resident HUD**
-- **Bio-Grid Scanner**: Real-time detection of persistent on-chain zombie entities.
-- **Vitals Monitor**: Dynamic CRT animations tracking HP, Infection Levels, and Ammo reserves.
-- **Combat Overlay**: High-intensity muzzle flash and damage feedback systems.
+InfectionX is architected to leverage the full OneChain ecosystem:
+- **OneWallet System**: All game actions (Firing, Healing, Recycling) are processed through the `dapp-kit` transaction engine.
+- **OneID Bio-Signature**: Player identity and "On-Chain Session" status are derived from unified OneID profiles.
+- **OnePlay Target**: Designed for high-performance deployment on the OnePlay GameFi hub.
+- **OneTransfer Logic**: Backend support for peer-to-peer equipment drops and fragment transfers.
+
+## 🕹️ **Core Game Engine Features**
 
 ### 🎖️ **Officer Archetypes**
 Choose your specialization:

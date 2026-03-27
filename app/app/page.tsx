@@ -471,11 +471,25 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Corner Accents */}
-      <div className="fixed top-0 left-0 w-32 h-32 border-t border-l border-hud-blue/20 pointer-events-none z-50" />
-      <div className="fixed top-0 right-0 w-32 h-32 border-t border-r border-hud-blue/20 pointer-events-none z-50" />
-      <div className="fixed bottom-0 left-0 w-32 h-32 border-b border-l border-hud-blue/20 pointer-events-none z-50" />
-      <div className="fixed bottom-0 right-0 w-32 h-32 border-b border-r border-hud-blue/20 pointer-events-none z-50" />
+      {/* OneChain Ecosystem Branding */}
+      <div className="fixed bottom-4 right-6 flex items-center gap-4 opacity-50 z-50 pointer-events-none">
+        <div className="flex flex-col items-end">
+          <span className="text-[8px] uppercase tracking-widest text-hud-blue/50">Infrastructure</span>
+          <span className="text-[10px] font-bold text-hud-blue">OneChain Move</span>
+        </div>
+        <div className="h-8 w-px bg-hud-blue/20" />
+        <div className="flex flex-col items-end">
+          <span className="text-[8px] uppercase tracking-widest text-hud-blue/50">Authenticated Via</span>
+          <span className="text-[10px] font-bold text-hud-blue">OneID</span>
+        </div>
+        <div className="h-8 w-px bg-hud-blue/20" />
+        <div className="flex flex-col items-end">
+          <span className="text-[8px] uppercase tracking-widest text-hud-blue/50">Asset Engine</span>
+          <span className="text-[10px] font-bold text-hud-blue">OneWallet</span>
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-hud-blue/20 to-transparent z-100" />
     </motion.div>
   );
 }

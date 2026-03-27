@@ -239,6 +239,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
       isCreatingHunter.current = true;
       try {
+        const timer = setTimeout(() => {
+          if (isCreatingHunter.current) {
+            setError("REGISTRATION TIMEOUT: CHECK WALLET POPUP");
+          }
+        }, 30000);
+
         const result = await client.moveCall({
           packageId: PACKAGE_ID,
           module: MODULES.hunter,
@@ -246,15 +252,20 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
           args: [classId],
         });
 
+        clearTimeout(timer);
         const createdId = extractCreatedObjectId(result);
         if (createdId) {
           setHunterId(createdId);
+          await Promise.all([refreshInventory(), refreshZombies(), refreshRaidState()]);
+        } else {
+          // If extraction failed but transaction succeeded, try manual refresh
+          if (address) await createHunterIfMissing(address);
         }
       } finally {
         isCreatingHunter.current = false;
       }
     });
-  }, [withErrorBoundary]);
+  }, [withErrorBoundary, refreshInventory, refreshZombies, refreshRaidState, createHunterIfMissing, address]);
 
   const connect = useCallback(async () => {
     // Connection handled by dapp-kit ConnectButton
@@ -319,9 +330,20 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         args: [durationEpochs],
       });
 
-      const createdId = extractCreatedObjectId(result);
+      let createdId = extractCreatedObjectId(result);
+      
+      // Fallback: Manually scan if ID parsing failed
+      if (!createdId && address) {
+        console.warn("[WalletContext] Failed to parse session ID from response, performing manual scan...");
+        const sessionKeys = await getOwnedByType(address, TYPES.sessionKey);
+        if (sessionKeys.length > 0) {
+          // Take the most recently created session key (last in list)
+          createdId = sessionKeys[sessionKeys.length - 1].objectId;
+        }
+      }
+
       if (!createdId) {
-        throw new Error("Session key created but id could not be parsed from response");
+        throw new Error("Session key created but id could not be synchronized. Please refresh.");
       }
 
       sessionKeyRef.current = createdId;

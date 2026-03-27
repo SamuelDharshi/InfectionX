@@ -3,26 +3,30 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   SuiClientProvider,
   WalletProvider as DappKitWalletProvider,
-  useSuiClient,
   useSignAndExecuteTransaction,
-  ConnectButton,
+  useCurrentAccount,
+  useDisconnectWallet,
 } from '@onelabs/dapp-kit';
 import { OneIDProvider } from "../context/OneIDContext";
 import { WalletProvider } from "../context/WalletContext";
 import { useEffect, useMemo } from 'react';
 import { Transaction } from '@onelabs/sui/transactions';
-import { useCurrentAccount, useDisconnectWallet } from '@onelabs/dapp-kit';
+import { SuiClient } from '@onelabs/sui/client';
 import { type OneWalletClient } from "../lib/onewallet";
 import '@onelabs/dapp-kit/dist/index.css';
 
 const queryClient = new QueryClient();
 
-// Use OneChain testnet RPC — NOT Sui testnet
+// Use OneChain testnet RPC
 const ONECHAIN_RPC = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc-testnet.onelabs.cc';
-const networks = { testnet: { url: ONECHAIN_RPC } };
+const networks = { 
+  testnet: { url: ONECHAIN_RPC },
+  onechain: { url: ONECHAIN_RPC }
+};
 
 function AppProviders({ children }: { children: React.ReactNode }) {
-  const suiClient = useSuiClient();
+  // Use a stable, local client for the bridge to prevent "Failed to fetch" dapp-kit overrides
+  const localSuiClient = useMemo(() => new SuiClient({ url: ONECHAIN_RPC }), []);
   const currentAccount = useCurrentAccount();
   const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const { mutateAsync: disconnectWallet } = useDisconnectWallet();
@@ -38,12 +42,12 @@ function AppProviders({ children }: { children: React.ReactNode }) {
         if (!owner) return { data: [] };
         let hasNextPage = true;
         let nextCursor: string | null = null;
-        const objects: any[] = []; // Explicit any to match Sui response types
+        const objects: any[] = [];
         try {
           while (hasNextPage) {
-            const res = await suiClient.getOwnedObjects({
+            const res: any = await localSuiClient.getOwnedObjects({
               owner,
-              filter: filter?.StructType ? { StructType: filter.StructType } : undefined,
+              filter: (filter?.StructType && filter?.StructType.length < 50) ? { StructType: filter.StructType } : undefined,
               options: { showContent: true, showType: true },
               cursor: nextCursor,
             });
@@ -51,9 +55,19 @@ function AppProviders({ children }: { children: React.ReactNode }) {
             hasNextPage = res.hasNextPage;
             nextCursor = res.nextCursor ?? null;
           }
-        } catch { return { data: [] }; }
+        } catch (err) { 
+          console.error(`[OneWallet Bridge] Fetch failed at ${ONECHAIN_RPC}:`, err);
+          return { data: [] }; 
+        }
+
+        // Manual filtering for robustness
+        let filteredObjects = objects;
+        if (filter?.StructType) {
+          filteredObjects = objects.filter(o => o.data?.type === filter.StructType);
+        }
+
         return {
-          data: objects
+          data: filteredObjects
             .filter(o => o.data != null)
             .map(o => ({
               objectId: o.data.objectId,
@@ -80,16 +94,24 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           arguments: callArgs as any,
           typeArguments: args.typeArguments || [],
         });
-        tx.setGasBudget(10000000); 
+        tx.setGasBudget(20000000); 
         
-        return await signAndExecuteTransaction({ 
-             transaction: tx,
-             // @ts-expect-error - dapp-kit types might be outdated
-             options: { showEffects: true, showObjectChanges: true }
-        });
+        try {
+          console.log(`[OneWallet Bridge] Executing ${args.module}::${args.func}...`);
+          const result = await signAndExecuteTransaction({ 
+               transaction: tx,
+               // @ts-expect-error - dapp-kit types might be outdated
+               options: { showEffects: true, showObjectChanges: true }
+          });
+          console.log("[OneWallet Bridge] Transaction Result:", result);
+          return result;
+        } catch (err) {
+          console.error("[OneWallet Bridge] Transaction Failed:", err);
+          throw err;
+        }
       },
       subscribe: async (eventType: string, cb: (e: unknown) => void) => {
-        const unsub = await suiClient.subscribeEvent({
+        const unsub = await localSuiClient.subscribeEvent({
           filter: { MoveEventType: eventType },
           onMessage: cb,
         });
@@ -97,7 +119,7 @@ function AppProviders({ children }: { children: React.ReactNode }) {
       },
       getEpochDurationMs: async () => 1000,
     };
-  }, [suiClient, currentAccount, signAndExecuteTransaction, disconnectWallet]);
+  }, [localSuiClient, currentAccount, signAndExecuteTransaction, disconnectWallet]);
 
   useEffect(() => {
     if (walletClient) {
@@ -112,12 +134,12 @@ function AppProviders({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { ConnectButton as DappKitConnectButton };
+export { ConnectButton as DappKitConnectButton } from '@onelabs/dapp-kit';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networks} defaultNetwork="testnet">
+      <SuiClientProvider networks={networks} defaultNetwork="onechain">
         <DappKitWalletProvider>
           <AppProviders>{children}</AppProviders>
         </DappKitWalletProvider>

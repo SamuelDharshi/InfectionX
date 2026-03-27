@@ -1,0 +1,13 @@
+{
+  "name": "contracts",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "move:new": "one move new resident_system",
+    "move:build": "cd resident_system && one move build",
+    "move:test": "cd resident_system && one move test",
+    "client:envs": "cd resident_system && one client envs",
+    "client:active-env": "cd resident_system && one client active-env",
+    "client:publish": "cd resident_system && one client publish --gas-budget 100000000"
+  }
+}

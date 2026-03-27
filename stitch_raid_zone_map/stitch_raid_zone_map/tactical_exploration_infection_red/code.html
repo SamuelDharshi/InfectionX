@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#ffc8c2",
+              "on-error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#783029",
+              "surface-container-highest": "#462f2e",
+              "surface-container-low": "#2a1616",
+              "inverse-primary": "#b52424",
+              "on-secondary-fixed": "#410002",
+              "error-container": "#93000a",
+              "on-tertiary-fixed": "#3e0404",
+              "primary-container": "#b22222",
+              "outline": "#aa8986",
+              "inverse-on-surface": "#412b2a",
+              "primary-fixed": "#ffdad6",
+              "on-surface": "#fedad8",
+              "secondary-container": "#d30017",
+              "surface-tint": "#ffb4ac",
+              "inverse-surface": "#fedad8",
+              "on-secondary": "#690006",
+              "on-secondary-fixed-variant": "#93000c",
+              "surface-dim": "#200e0e",
+              "on-error": "#690005",
+              "tertiary": "#ffb4ab",
+              "on-tertiary-container": "#ffc8c1",
+              "surface-container-lowest": "#1a0909",
+              "tertiary-fixed": "#ffdad6",
+              "secondary": "#ffb4ab",
+              "secondary-fixed-dim": "#ffb4ab",
+              "background": "#200e0e",
+              "on-background": "#fedad8",
+              "on-primary-fixed": "#410003",
+              "surface-container-high": "#3a2424",
+              "secondary-fixed": "#ffdad6",
+              "on-surface-variant": "#e2beba",
+              "on-secondary-container": "#ffe2de",
+              "on-primary": "#690007",
+              "tertiary-container": "#93443d",
+              "surface": "#200e0e",
+              "surface-container": "#2e1a1a",
+              "tertiary-fixed-dim": "#ffb4ab",
+              "surface-variant": "#462f2e",
+              "surface-bright": "#4a3332",
+              "on-tertiary": "#5b1a15",
+              "error": "#ffb4ab",
+              "primary": "#ffb4ac",
+              "on-primary-fixed-variant": "#92030f",
+              "outline-variant": "#5a403e",
+              "primary-fixed-dim": "#ffb4ac"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Space Grotesk"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scanline-overlay {
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+        .glitch-border {
+            clip-path: polygon(0 0, 90% 0, 100% 10%, 100% 100%, 0 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-white overflow-hidden">
+<!-- Global Scan-Line Overlay -->
+<div class="fixed inset-0 z-[100] scanline-overlay opacity-20"></div>
+<!-- Top Navigation Bar -->
+<header class="bg-[#200e0e] flex justify-between items-center w-full px-6 py-4 fixed top-0 left-0 z-50 shadow-[0_0_15px_rgba(255,180,172,0.05)]">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold text-red-600 dark:text-red-500 tracking-widest font-headline uppercase">SYSTEM_BIO_SYNC_v2.0</span>
+<div class="bg-[#2a1616] h-[20px] w-[2px]"></div>
+<span class="text-red-400 font-bold font-headline text-sm tracking-widest">SECTOR_07 // RUINS</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-red-900/60 hover:bg-red-500/10 hover:translate-x-1 transition-transform p-2">
+<span class="material-symbols-outlined">notifications_active</span>
+</button>
+<button class="text-red-900/60 hover:bg-red-500/10 hover:translate-x-1 transition-transform p-2">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+</div>
+</header>
+<!-- Sidebar Navigation (Tactical Map Active) -->
+<aside class="flex flex-col fixed left-0 top-0 h-full z-40 bg-[#2a1616] w-64 border-r border-red-900/15 pt-20">
+<div class="px-6 py-4 mb-4">
+<h2 class="text-lg font-black text-red-500 font-headline uppercase">SECTOR_07</h2>
+<p class="text-[10px] font-mono text-red-400/60 tracking-tighter">QUARANTINE_ACTIVE</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-red-400 border-l-4 border-red-600 bg-red-950/30 pl-4 py-3 font-mono text-sm transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">map</span>
+<span>TACTICAL_MAP</span>
+</a>
+<a class="flex items-center gap-3 text-red-900 pl-4 py-3 font-mono text-sm hover:bg-red-900/20 hover:text-red-300 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span>BIO_DATA</span>
+</a>
+<a class="flex items-center gap-3 text-red-900 pl-4 py-3 font-mono text-sm hover:bg-red-900/20 hover:text-red-300 transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>INVENTORY</span>
+</a>
+</nav>
+<div class="p-6">
+<button class="w-full bg-primary-container text-white py-4 font-bold tracking-widest text-sm hover:bg-primary transition-all active:scale-95">
+                INITIATE_PURGE
+            </button>
+</div>
+</aside>
+<!-- Main Tactical HUD Canvas -->
+<main class="ml-64 pt-16 pb-20 h-screen relative overflow-hidden bg-surface-dim">
+<!-- Tactical Viewport (Background Image) -->
+<div class="absolute inset-0 z-0">
+<img alt="Cinematic wide shot of ruined dystopian city street with crumbling skyscrapers, thick gray fog, and ominous red emergency flares" class="w-full h-full object-cover opacity-50 contrast-125 grayscale" data-alt="destroyed city ruins at night with thick atmospheric fog, crumbling concrete structures, and glowing red emergency lights reflecting on wet pavement" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVz2hp3FRHabVV-ULEq9CEOWZtsiAg3t4p1PJK4MdXYgzq_4hRmHgSI7oXO_lpPVLrd_CE3fdm6jIDVh9V0TjCZkgWugSV9IJN7L1R4HwpkD8r2I38zujbAQzfM_KbaSTlp-Yg1y-LLhFt6iXnbHNYPXQjmaeWx9QOWVHHVC5UK6LhN96ogeH-AIWV9iqONorP0031avuKE2qu7hjejTM5N5QDHBzQlljxHx6IiT8QOWFzYjsh7Pqu67-CPZkkNPttLY607Cyt0Pw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+</div>
+<!-- HUD Elements Overlay -->
+<div class="relative z-10 w-full h-full p-8 pointer-events-none">
+<!-- Threat Detection Box -->
+<div class="absolute top-[30%] right-[25%] w-64 h-80 border-2 border-primary border-dashed animate-pulse pointer-events-auto">
+<div class="absolute -top-8 left-0 bg-primary-container text-white px-3 py-1 text-[10px] font-bold tracking-tighter">
+                    THREAT_DETECTED: ABOMINATION_CL_4
+                </div>
+<div class="absolute top-2 right-2 flex flex-col items-end gap-1">
+<span class="text-primary text-[10px] font-mono">DIST: 14.2m</span>
+<span class="text-primary text-[10px] font-mono">HOSTILITY: MAX</span>
+</div>
+<!-- Visual highlight of the threat area -->
+<div class="w-full h-full bg-primary/10 backdrop-blur-[2px]"></div>
+<div class="absolute bottom-2 left-2 flex gap-1">
+<div class="w-1 h-4 bg-primary"></div>
+<div class="w-1 h-3 bg-primary/60"></div>
+<div class="w-1 h-2 bg-primary/30"></div>
+</div>
+</div>
+<!-- Loot Container Highlight -->
+<div class="absolute bottom-[20%] left-[10%] pointer-events-auto group">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 bg-surface-container-highest/80 backdrop-blur-md px-4 py-2 border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">inventory</span>
+<span class="text-on-primary-container text-xs font-bold font-mono tracking-widest">LOOT_FOUND: AMMO_BOX</span>
+</div>
+<div class="w-48 h-32 border border-primary/40 relative">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent"></div>
+<div class="absolute top-0 right-0 p-1">
+<span class="text-[8px] text-primary/60">#CONT-772</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Heart Rate & Vitals (Bottom Left) -->
+<div class="absolute bottom-8 left-8 flex items-end gap-6 pointer-events-auto">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-mono text-primary/60 uppercase">Vital_Sign</span>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-bold text-primary font-headline tracking-tighter">72</span>
+<span class="text-xs font-mono text-primary">BPM</span>
+</div>
+<div class="bg-surface-container-high h-1 w-32 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-2/3"></div>
+</div>
+<span class="text-[10px] font-mono text-primary font-bold mt-1">STATUS: STABLE</span>
+</div>
+<!-- Mini-ECG visual -->
+<div class="h-12 w-24 flex items-end gap-[2px]">
+<div class="w-[2px] h-2 bg-primary/30"></div>
+<div class="w-[2px] h-3 bg-primary/40"></div>
+<div class="w-[2px] h-8 bg-primary"></div>
+<div class="w-[2px] h-2 bg-primary/30"></div>
+<div class="w-[2px] h-4 bg-primary/50"></div>
+<div class="w-[2px] h-10 bg-primary"></div>
+<div class="w-[2px] h-3 bg-primary/30"></div>
+</div>
+</div>
+<!-- Battery & Scan Bars (Top Right) -->
+<div class="absolute top-8 right-8 flex flex-col gap-4 items-end pointer-events-auto">
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-mono text-primary/60">HUD_POWER</span>
+<div class="flex gap-[2px]">
+<div class="w-2 h-4 bg-primary"></div>
+<div class="w-2 h-4 bg-primary"></div>
+<div class="w-2 h-4 bg-primary"></div>
+<div class="w-2 h-4 bg-primary/20"></div>
+<div class="w-2 h-4 bg-primary/20"></div>
+</div>
+<span class="text-xs font-bold text-primary font-mono">60%</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-mono text-primary/60">SCANNER_READY</span>
+<div class="w-40 h-1 bg-surface-container-high relative">
+<div class="absolute inset-y-0 left-0 bg-primary w-[85%]"></div>
+</div>
+<span class="text-[10px] font-mono text-primary">85%</span>
+</div>
+</div>
+</div>
+<!-- Coordinate Data (Bottom Right) -->
+<div class="absolute bottom-8 right-8 text-right font-mono">
+<p class="text-[10px] text-primary/60">LAT: 40.7128° N</p>
+<p class="text-[10px] text-primary/60">LONG: 74.0060° W</p>
+<p class="text-[10px] text-primary font-bold mt-1">SECTOR: 07-RUINS-ALPHA</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Inventory-focused items) -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-[#200e0e] border-t-2 border-red-900/20 shadow-[0_-4px_20px_rgba(178,34,34,0.2)]">
+<button class="flex flex-col items-center justify-center text-red-900 p-2 hover:bg-red-950 transition-all active:scale-95 duration-100">
+<span class="material-symbols-outlined text-xl">medical_services</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest mt-1">SUPPLIES</span>
+</button>
+<button class="flex flex-col items-center justify-center text-red-900 p-2 hover:bg-red-950 transition-all active:scale-95 duration-100">
+<span class="material-symbols-outlined text-xl">emergency</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest mt-1">MEDKIT</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-red-700 text-red-100 p-2 scale-105 transition-all duration-100">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">electric_bolt</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest mt-1">AMMO</span>
+</button>
+<button class="flex flex-col items-center justify-center text-red-900 p-2 hover:bg-red-950 transition-all active:scale-95 duration-100">
+<span class="material-symbols-outlined text-xl">sensors</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest mt-1">COMMS</span>
+</button>
+</footer>
+</body></html>

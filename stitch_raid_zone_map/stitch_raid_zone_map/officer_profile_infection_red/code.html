@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OFFICER_PROFILE_ONEID</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#ffc8c2",
+              "on-error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#783029",
+              "surface-container-highest": "#462f2e",
+              "surface-container-low": "#2a1616",
+              "inverse-primary": "#b52424",
+              "on-secondary-fixed": "#410002",
+              "error-container": "#93000a",
+              "on-tertiary-fixed": "#3e0404",
+              "primary-container": "#b22222",
+              "outline": "#aa8986",
+              "inverse-on-surface": "#412b2a",
+              "primary-fixed": "#ffdad6",
+              "on-surface": "#fedad8",
+              "secondary-container": "#d30017",
+              "surface-tint": "#ffb4ac",
+              "inverse-surface": "#fedad8",
+              "on-secondary": "#690006",
+              "on-secondary-fixed-variant": "#93000c",
+              "surface-dim": "#200e0e",
+              "on-error": "#690005",
+              "tertiary": "#ffb4ab",
+              "on-tertiary-container": "#ffc8c1",
+              "surface-container-lowest": "#1a0909",
+              "tertiary-fixed": "#ffdad6",
+              "secondary": "#ffb4ab",
+              "secondary-fixed-dim": "#ffb4ab",
+              "background": "#200e0e",
+              "on-background": "#fedad8",
+              "on-primary-fixed": "#410003",
+              "surface-container-high": "#3a2424",
+              "secondary-fixed": "#ffdad6",
+              "on-surface-variant": "#e2beba",
+              "on-secondary-container": "#ffe2de",
+              "on-primary": "#690007",
+              "tertiary-container": "#93443d",
+              "surface": "#200e0e",
+              "surface-container": "#2e1a1a",
+              "tertiary-fixed-dim": "#ffb4ab",
+              "surface-variant": "#462f2e",
+              "surface-bright": "#4a3332",
+              "on-tertiary": "#5b1a15",
+              "error": "#ffb4ab",
+              "primary": "#ffb4ac",
+              "on-primary-fixed-variant": "#92030f",
+              "outline-variant": "#5a403e",
+              "primary-fixed-dim": "#ffb4ac"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Space Grotesk"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .scan-line {
+            background: linear-gradient(to bottom, transparent 50%, rgba(254, 218, 216, 0.03) 50%);
+            background-size: 100% 3px;
+            pointer-events: none;
+        }
+        .asymmetric-clip {
+            clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%);
+        }
+        .biometric-chart {
+            background-image: radial-gradient(circle at 50% 50%, #b22222 0%, transparent 70%);
+            mask-image: linear-gradient(0deg, black, transparent);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body overflow-x-hidden">
+<!-- Scanline Overlay -->
+<div class="fixed inset-0 z-[100] scan-line"></div>
+<!-- TopNavBar -->
+<header class="bg-[#200e0e] flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50 shadow-[0_0_15px_rgba(255,180,172,0.05)] border-b-0">
+<div class="text-xl font-bold text-red-600 dark:text-red-500 tracking-widest font-headline uppercase tracking-tighter">
+            SYSTEM_BIO_SYNC_v2.0
+        </div>
+<div class="hidden md:flex gap-8">
+<span class="text-red-900/60 font-headline uppercase tracking-tighter hover:bg-red-500/10 hover:translate-x-1 transition-transform cursor-pointer">TACTICAL_MAP</span>
+<span class="text-red-400 font-bold font-headline uppercase tracking-tighter hover:bg-red-500/10 hover:translate-x-1 transition-transform cursor-pointer">BIO_DATA</span>
+<span class="text-red-900/60 font-headline uppercase tracking-tighter hover:bg-red-500/10 hover:translate-x-1 transition-transform cursor-pointer">INVENTORY</span>
+</div>
+<div class="flex gap-4 items-center">
+<span class="material-symbols-outlined text-red-400">notifications_active</span>
+<span class="material-symbols-outlined text-red-400">settings_input_component</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-4 md:px-12 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Left Column: Biometric Scan & Core Identity -->
+<div class="md:col-span-4 space-y-6">
+<div class="surface-container-low p-1 border-l-4 border-primary-container asymmetric-clip bg-[#2a1616]">
+<div class="relative h-64 w-full bg-black overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 grayscale brightness-50" data-alt="Technical close-up of a tactical helmet camera feed showing distorted digital scan lines and red biological sensors in a dark room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbuWREdYFygnuk3FU_dk33X1b3bJojgFm5OiEfhsh7vaRlBKKUh6BrA3MKCqiP1pa9bt6pxhH-nvZZsztVr2vrwyGquXAuQCZFsJExnMrocY42eHhBJlQvyxrOtiAqh6-GMGrugOjo2AisTw0kw19Iu_ORuviB9uZPb3vtqqirPLoVjjTY4PvB6bFIcBQzo6ZfRUpteRmA0hJTD6CcFfEoibMQqPDvOoIcioZNFc0pbA5BmTzCPapaTVWb_VrVbNRXrsIpBuCrRJE"/>
+<div class="absolute inset-0 biometric-chart opacity-40"></div>
+<div class="absolute bottom-4 left-4">
+<p class="text-[10px] font-mono text-primary uppercase tracking-[0.3em]">ID_RECOGNITION_CONFIRMED</p>
+<h1 class="text-2xl font-black text-on-surface font-headline">OFFICER_ONEID_779</h1>
+</div>
+</div>
+<div class="p-4 space-y-2">
+<div class="flex justify-between items-center text-[10px] font-mono text-outline">
+<span>LAT: 34.0522° N</span>
+<span>LNG: 118.2437° W</span>
+</div>
+<div class="h-[2px] w-full bg-red-900/20"></div>
+<p class="text-xs text-on-surface-variant leading-relaxed">BIO_SIGNATURE: STABLE<br/>VIRAL_LOAD: 0.002% (THRESHOLD_SAFE)</p>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary py-4 font-bold text-sm tracking-widest hover:bg-primary transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">system_update</span>
+                UPDATE_FIRMWARE
+            </button>
+<!-- Survivor Badge Collection -->
+<div class="bg-surface-container-high p-4 border border-outline-variant/15">
+<h3 class="text-xs font-black text-primary mb-4 tracking-widest">SURVIVOR_ACHIEVEMENTS</h3>
+<div class="grid grid-cols-4 gap-2">
+<div class="aspect-square bg-primary-container/20 flex items-center justify-center border border-primary/30 group hover:bg-primary/40 transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">shield_moon</span>
+</div>
+<div class="aspect-square bg-primary-container/20 flex items-center justify-center border border-primary/30 group hover:bg-primary/40 transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">skull</span>
+</div>
+<div class="aspect-square bg-primary-container/20 flex items-center justify-center border border-primary/30 group hover:bg-primary/40 transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">biotech</span>
+</div>
+<div class="aspect-square bg-primary-container/10 flex items-center justify-center border border-outline-variant/30 grayscale">
+<span class="material-symbols-outlined text-outline-variant">lock</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Stats & Data Visualization -->
+<div class="md:col-span-8 space-y-6">
+<!-- Hero Stats Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Stat Card: Kills -->
+<div class="bg-surface-container-low p-6 border-r border-primary-container/30 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-5">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">target</span>
+</div>
+<p class="text-[10px] font-mono text-outline uppercase tracking-widest mb-1">TOTAL_KILLS</p>
+<p class="text-4xl font-black text-primary font-headline">4,812</p>
+<div class="mt-4 h-1 w-full bg-red-950 overflow-hidden">
+<div class="h-full bg-secondary w-[85%]"></div>
+</div>
+</div>
+<!-- Stat Card: Raids -->
+<div class="bg-surface-container-low p-6 border-r border-primary-container/30 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-5">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">deployed_code</span>
+</div>
+<p class="text-[10px] font-mono text-outline uppercase tracking-widest mb-1">RAIDS_COMPLETED</p>
+<p class="text-4xl font-black text-primary font-headline">142</p>
+<div class="mt-4 h-1 w-full bg-red-950 overflow-hidden">
+<div class="h-full bg-secondary w-[62%]"></div>
+</div>
+</div>
+<!-- Stat Card: Survival -->
+<div class="bg-surface-container-low p-6 border-r border-primary-container/30 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-5">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<p class="text-[10px] font-mono text-outline uppercase tracking-widest mb-1">SURVIVAL_TIME</p>
+<p class="text-4xl font-black text-primary font-headline">842H</p>
+<div class="mt-4 h-1 w-full bg-red-950 overflow-hidden">
+<div class="h-full bg-secondary w-[91%]"></div>
+</div>
+</div>
+</div>
+<!-- Complex Data Visualization Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Biometric Pulse Chart -->
+<div class="bg-[#2a1616] p-6 asymmetric-clip border border-primary/10">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xs font-black text-on-surface tracking-widest">NEURAL_PULSE_MONITOR</h2>
+<span class="text-[10px] font-mono text-primary animate-pulse">LIVE_FEED</span>
+</div>
+<div class="h-48 flex items-end gap-1 px-2">
+<!-- Simulated Pulse bars -->
+<div class="bg-primary/40 w-full h-[30%]"></div>
+<div class="bg-primary/40 w-full h-[45%]"></div>
+<div class="bg-primary/60 w-full h-[60%]"></div>
+<div class="bg-primary/80 w-full h-[90%]"></div>
+<div class="bg-secondary w-full h-[40%]"></div>
+<div class="bg-primary/60 w-full h-[75%]"></div>
+<div class="bg-primary/40 w-full h-[55%]"></div>
+<div class="bg-primary/40 w-full h-[35%]"></div>
+<div class="bg-primary/40 w-full h-[65%]"></div>
+<div class="bg-primary/60 w-full h-[85%]"></div>
+<div class="bg-primary/40 w-full h-[45%]"></div>
+<div class="bg-primary/40 w-full h-[30%]"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] font-mono text-outline">
+<span>00:00:00</span>
+<span>SAMPLING_RATE: 124Hz</span>
+<span>00:00:15</span>
+</div>
+</div>
+<!-- Mission Log Terminal -->
+<div class="bg-[#1a0909] p-6 border-l border-primary/20">
+<h2 class="text-xs font-black text-primary mb-4 tracking-widest">LOG_RECAP_LAST_24H</h2>
+<div class="space-y-4 font-mono text-[11px]">
+<div class="flex gap-4 border-b border-white/5 pb-2">
+<span class="text-primary-container">04:12</span>
+<span class="text-on-surface-variant">SECTOR_07_BREACH: 12_OBJECTS_NEUTRALIZED</span>
+</div>
+<div class="flex gap-4 border-b border-white/5 pb-2">
+<span class="text-primary-container">08:45</span>
+<span class="text-on-surface-variant">SUPPLY_DROP_RECOVERY: SUCCESS (MEDKIT x2)</span>
+</div>
+<div class="flex gap-4 border-b border-white/5 pb-2">
+<span class="text-primary-container">13:20</span>
+<span class="text-secondary font-bold">WARNING: BIO_SCAN_ANOMALY_DETECTED</span>
+</div>
+<div class="flex gap-4 border-b border-white/5 pb-2">
+<span class="text-primary-container">19:10</span>
+<span class="text-on-surface-variant">COMM_TOWER_REBOOT: IN_PROGRESS</span>
+</div>
+<div class="flex gap-4">
+<span class="text-primary-container">22:01</span>
+<span class="text-on-surface-variant">DORMANT_STATE_INITIATED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Equipment/Inventory Teaser -->
+<div class="bg-surface-container-high p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div>
+<h2 class="text-lg font-black tracking-tighter uppercase italic">PROTOCOL_RED_EQUIPMENT_STATUS</h2>
+<p class="text-sm text-on-surface-variant mt-1">Current loadout performance is 88.4% optimal.</p>
+</div>
+<div class="flex gap-4">
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center border border-primary text-primary">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<span class="text-[9px] font-mono mt-2 block">ARMOR</span>
+</div>
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center border border-primary text-primary">
+<span class="material-symbols-outlined">handshake</span>
+</div>
+<span class="text-[9px] font-mono mt-2 block">POWER</span>
+</div>
+<div class="text-center">
+<div class="w-12 h-12 flex items-center justify-center border border-outline-variant text-outline-variant">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<span class="text-[9px] font-mono mt-2 block">NRG_LOW</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-[#200e0e] border-t-2 border-red-900/20 shadow-[0_-4px_20px_rgba(178,34,34,0.2)] md:hidden">
+<div class="flex flex-col items-center justify-center text-red-900 p-2">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest uppercase">SUPPLIES</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-red-700 text-red-100 p-2 scale-105">
+<span class="material-symbols-outlined">emergency</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest uppercase">MEDKIT</span>
+</div>
+<div class="flex flex-col items-center justify-center text-red-900 p-2">
+<span class="material-symbols-outlined">electric_bolt</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest uppercase">AMMO</span>
+</div>
+<div class="flex flex-col items-center justify-center text-red-900 p-2">
+<span class="material-symbols-outlined">sensors</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-bold tracking-widest uppercase">COMMS</span>
+</div>
+</nav>
+</body></html>

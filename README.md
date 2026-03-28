@@ -25,7 +25,25 @@ High-stakes survival RPG built on OneChain (One chain Testnet).** > Featuring a 
 │  ✅ On-Chain Zombies  ✅ Vaccine Minting                         │
 └─────────────────────────────────────────────────────────────────┘
 ```
+📋 Core Features (MVP Scope)
+🛡️ Officer Archetypes
+Pointman (Tank): High Vitality. Uses Shared Object Riot Shields to block Big Zombie attacks.
 
+Medic (Healer): Specializes in crafting Virus Treatment on-chain to buff the squad.
+
+Sharpshooter (Assassin): High Crit-rate for high-frequency "Small Zombie" elimination.
+
+🧟 The Infection Loop
+The Virus: A Global Shared Object. If players fail raids, the "Infection Rate" increases, buffing all zombies server-wide.
+
+Small Zombies (Lickers): High-frequency, low-latency combat.
+
+Big Zombies (Tyrants): Requires a Multi-Sig Raid. 2–4 officers must call a joint Move function to neutralize the threat.
+
+🧪 The Cure (Win Condition)
+Defeating Big Zombies drops Vaccine_Fragment objects.
+
+Combine 10 fragments in a Lab_Object to mint a permanent Survivor Badge (NFT).
 ---
 
 ## 🚀 Quick Start (2 Minutes)

@@ -1,11 +1,11 @@
-```markdown
-# ☣️ InfectionX — Tactical Bio-Hazard Survival
 
-> **High-stakes survival RPG built on OneChain (One chain Testnet).** > Featuring a "Hazard Red" CRT tactical interface, real-time on-chain combat, and an advanced Archetype strategy system.
+InfectionX — Tactical Bio-Hazard Survival
+
+High-stakes survival RPG built on OneChain (One chain Testnet).** > Featuring a "Hazard Red" CRT tactical interface, real-time on-chain combat, and an advanced Archetype strategy system.
 
 ---
 
-## 🕹️ Survival Flow
+ Survival Flow
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
@@ -141,5 +141,3 @@ NEXT_PUBLIC_ONECHAIN_RPC=[https://rpc-testnet.onelabs.cc](https://rpc-testnet.on
 **Network:** OneChain Testnet (Sui)  
 **Transmission:** Encrypted
 ```
-
-Would you like me to create a **`SUBMISSION.md`** template tailored for your OneHack 3.0 entry?
